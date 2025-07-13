@@ -1,101 +1,118 @@
 package com.example.appdiag
 
-import android.location.Geocoder
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AlertDialog
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
+import com.google.android.flexbox.FlexboxLayout
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import java.util.Locale
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import android.graphics.Color
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var autoCompleteRue: AutoCompleteTextView
+    private lateinit var titreIntersections: TextView
+    private lateinit var intersectionContainer: FlexboxLayout
     private lateinit var map: MapView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Config OSMDroid
-        Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
-        Configuration.getInstance().userAgentValue = packageName
-
         setContentView(R.layout.activity_main)
+
+        autoCompleteRue = findViewById(R.id.autoCompleteRue)
+        titreIntersections = findViewById(R.id.titreIntersections)
+        intersectionContainer = findViewById(R.id.intersectionContainer)
+
+        // Données source : liste d’intersections
+        val intersectionsMap = mapOf(
+            "Avenue des AUBEPINES" to listOf("LAFARGUE P.", "VIOLETTES (des)", "ORMES (des)"),
+            "Rue AUDAT (P.)" to listOf("LATTRE DE TASSIGNY (Mal de)", "ACCES PARKING", "VOIE SANS ISSUE", "VOIE SANS ISSUE", "ACCES TENNIS"),
+            "Allée AUDIBERTI J." to listOf("MELIES G.", "EINSTEIN A."),
+            "Avenue des AULNES" to listOf("REPUBLIQUE (de la)", "SOLIDARITE (de la)", "VAILLANT C.")
+        )
+
+        // Demande de permission localisation
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+        }
+
+        // Remplir l'AutoCompleteTextView
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, intersectionsMap.keys.toList())
+        autoCompleteRue.setAdapter(adapter)
+
+        // Gérer la sélection
+        autoCompleteRue.setOnItemClickListener { _, _, position, _ ->
+            val rueChoisie = adapter.getItem(position)
+            val intersections = intersectionsMap[rueChoisie]
+            afficherIntersections(intersections)
+        }
 
         // Initialisation de la carte
         map = findViewById(R.id.map)
+
+        Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
+
         map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setBuiltInZoomControls(true)
         map.setMultiTouchControls(true)
 
-        // Liste d'adresses à géocoder
-        val addresses = listOf(
-            "2 Avenue des Acacias, Paris, France",
-            "3 Allée Adamov, Paris, France",
-            "6 Allée d'Alembert, Paris, France",
-            "10 Square Allais, Paris, France"
-        )
-        val geocoder = Geocoder(this, Locale.getDefault())
+        val mapController = map.controller
+        mapController.setZoom(15.0)
+        val startPoint = GeoPoint(48.8583, 2.2944) // Tour Eiffel
+        mapController.setCenter(startPoint)
 
-        // Géocodage en arrière-plan
-        Thread {
-            for (address in addresses) {
-                try {
-                    val results = geocoder.getFromLocationName("$address, France", 1)
-                    if (!results.isNullOrEmpty()) {
-                        val location = results[0]
-                        val geoPoint = GeoPoint(location.latitude, location.longitude)
+        // ✅ Ajout de la position actuelle sur la carte
+        val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
+        myLocationOverlay.enableMyLocation()
+        map.overlays.add(myLocationOverlay)
 
-                        runOnUiThread {
-                            addMarkerWithPopup(geoPoint, address)
-                            if (address == addresses[0]) {
-                                map.controller.setZoom(16.0)
-                                map.controller.setCenter(geoPoint)
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("GeocodeError", "Failed to geocode $address: ${e.message}")
-                }
+        // ✅ Centrage automatique sur position GPS
+        myLocationOverlay.runOnFirstFix {
+            runOnUiThread {
+                map.controller.animateTo(myLocationOverlay.myLocation)
             }
-        }.start()
-    }
-
-    // Fonction pour ajouter un marqueur avec popup
-    private fun addMarkerWithPopup(point: GeoPoint, label: String) {
-        val marker = Marker(map)
-        marker.position = point
-        marker.title = label
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-
-        marker.setOnMarkerClickListener { m, _ ->
-            AlertDialog.Builder(this)
-                .setTitle("Panneau consulté ?")
-                .setMessage("Avez-vous consulté le panneau à : $label ?")
-                .setPositiveButton("Oui") { _, _ ->
-                    m.icon = ContextCompat.getDrawable(this, R.drawable.marker_checked)
-                    m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    map.invalidate()
-                }
-                .setNegativeButton("Non", null)
-                .show()
-            true
         }
-
-        map.overlays.add(marker)
     }
 
-    override fun onResume() {
-        super.onResume()
-        map.onResume()
-    }
+    private fun afficherIntersections(intersections: List<String>?) {
+        intersectionContainer.removeAllViews()
 
-    override fun onPause() {
-        super.onPause()
-        map.onPause()
+        if (!intersections.isNullOrEmpty()) {
+            titreIntersections.visibility = View.VISIBLE
+
+            intersections.forEach { nom ->
+                val bouton = Button(this).apply {
+                    text = nom
+                    textSize = 14f
+                    setAllCaps(false)
+                    setTextColor(Color.BLACK)
+                    setBackgroundResource(R.drawable.button_background)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        topMargin = 8
+                    }
+                }
+                intersectionContainer.addView(bouton)
+            }
+        } else {
+            titreIntersections.visibility = View.GONE
+        }
     }
 }
