@@ -16,6 +16,8 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import android.graphics.Color
+import android.content.Intent
+import android.util.Log
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.d("MainActivity", "Page chargée")
+
+        setContentView(R.layout.activity_main)
+
+        Log.d("MainActivity", "layout loaded") // ← Log 2
         autoCompleteRue = findViewById(R.id.autoCompleteRue)
         titreIntersections = findViewById(R.id.titreIntersections)
         intersectionContainer = findViewById(R.id.intersectionContainer)
@@ -35,7 +42,13 @@ class MainActivity : AppCompatActivity() {
         // Données source : liste d’intersections
         val intersectionsMap = mapOf(
             "Avenue des AUBEPINES" to listOf("LAFARGUE P.", "VIOLETTES (des)", "ORMES (des)"),
-            "Rue AUDAT (P.)" to listOf("LATTRE DE TASSIGNY (Mal de)", "ACCES PARKING", "VOIE SANS ISSUE", "VOIE SANS ISSUE", "ACCES TENNIS"),
+            "Rue AUDAT (P.)" to listOf(
+                "LATTRE DE TASSIGNY (Mal de)",
+                "ACCES PARKING",
+                "VOIE SANS ISSUE",
+                "VOIE SANS ISSUE",
+                "ACCES TENNIS"
+            ),
             "Allée AUDIBERTI J." to listOf("MELIES G.", "EINSTEIN A."),
             "Avenue des AULNES" to listOf("REPUBLIQUE (de la)", "SOLIDARITE (de la)", "VAILLANT C.")
         )
@@ -52,7 +65,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Remplir l'AutoCompleteTextView
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, intersectionsMap.keys.toList())
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_dropdown_item_1line,
+            intersectionsMap.keys.toList()
+        )
         autoCompleteRue.setAdapter(adapter)
 
         // Gérer la sélection
@@ -65,7 +82,10 @@ class MainActivity : AppCompatActivity() {
         // Initialisation de la carte
         map = findViewById(R.id.map)
 
-        Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
+        Configuration.getInstance().load(
+            applicationContext,
+            PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        )
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setBuiltInZoomControls(true)
@@ -107,6 +127,12 @@ class MainActivity : AppCompatActivity() {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
                         topMargin = 8
+                    }
+
+                    setOnClickListener {
+                        val intent = Intent(this@MainActivity, PanneauxActivity::class.java)
+                        intent.putExtra("intersection", nom) // Passer le nom du bouton
+                        startActivity(intent)
                     }
                 }
                 intersectionContainer.addView(bouton)
