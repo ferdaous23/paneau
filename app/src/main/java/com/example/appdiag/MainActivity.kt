@@ -5,13 +5,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.flexbox.FlexboxLayout
 import retrofit2.Call
@@ -25,10 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var autoCompleteRue: AutoCompleteTextView
     private lateinit var titreIntersections: TextView
     private lateinit var intersectionContainer: FlexboxLayout
-    private val intersectionsMap = mutableMapOf<String, List<String>>()
-
-    // ✅ DTO pour Retrofit (dans ce même fichier ou en fichier séparé)
-    data class RueResponse(val rue: String, val intersections: List<String>)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +42,13 @@ class MainActivity : AppCompatActivity() {
         autoCompleteRue.setAdapter(adapter)
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.250:8083/") // change ceci avec ton URL réelle
+            .baseUrl("http://192.168.1.250:8083/") // ← à adapter selon ton IP
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val apiService = retrofit.create(ApiService::class.java)
 
-        // 🔁 Appel API sur changement de texte
+        // 🔁 Suggestions en temps réel
         autoCompleteRue.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.length >= 2) {
@@ -79,11 +75,26 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Gérer la sélection
+        // ✅ Lorsqu'une rue est sélectionnée, afficher les départs
         autoCompleteRue.setOnItemClickListener { _, _, position, _ ->
             val rueChoisie = adapter.getItem(position)
-            val intersections = intersectionsMap[rueChoisie]
-            afficherIntersections(intersections)
+
+            apiService.getDeparts(rueChoisie!!)
+                .enqueue(object : Callback<List<String>> {
+                    override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                        if (response.isSuccessful) {
+                            val intersections = response.body()
+                            afficherIntersections(intersections)
+                        } else {
+                            afficherIntersections(emptyList())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                        t.printStackTrace()
+                        Toast.makeText(this@MainActivity, "Erreur réseau", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
     }
 

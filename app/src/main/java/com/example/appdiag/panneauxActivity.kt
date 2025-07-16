@@ -32,15 +32,19 @@ class PanneauxActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
+        // 🔙 Action de retour
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Panneaux"
+        // ✅ Récupérer le nom de l’intersection
+
         val nomIntersection = intent.getStringExtra("intersection")
         val textView = findViewById<TextView>(R.id.nomTextView)
-        textView.text = nomIntersection ?: "Aucune intersection"
-        textView.paintFlags = textView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        textView?.apply {
+            text = "Intersection : ${nomIntersection ?: "non définie"}"
+            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        }
 
-
-
+        // 📸 Gestion de la caméra
         val cameraIcon = findViewById<ImageView>(R.id.cameraIcon)
         cameraIcon.setOnClickListener {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -51,11 +55,12 @@ class PanneauxActivity : AppCompatActivity() {
             }
         }
     }
-
+    //🔙 Gestion du bouton "retour"
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
     }
+    // 🔐 Permissions
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
