@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FAFAFA">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="24dp"
     android:layout_width="match_parent"
@@ -17,13 +24,16 @@
         android:layout_margin="16dp"
         android:textColor="#900C3F"
         android:textAlignment="center" />
-    <EditText
-        android:id="@+id/editPanneau1"
+    <TextView
+        android:id="@+id/labelPanneauGaucheNord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du panneau"
-        android:inputType="text" />
-
+        android:text="Panneau Gauche (Nord)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginVertical="8dp"
+        android:gravity="center"/>
     <!-- Ligne : Spinner + TextView "Situation" -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,53 +44,93 @@
         android:layout_marginBottom="1px">
 
 
-
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Situation :"
             android:textSize="16sp"
             android:layout_gravity="center_vertical"/>
+    </LinearLayout>
 
-        <Spinner
-            android:id="@+id/spinnerSituation"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <CheckBox
+                android:id="@+id/checkF1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="F"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkCa1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="Ca"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkAA1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="AA"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkDF1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="DF"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="-40dp"
         android:padding="16dp">
 
         <EditText
-            android:id="@+id/editRemarque1"
+            android:id="@+id/editRemarqueGaucheNord"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_weight="1"
-            android:hint="Remarque"
-            android:inputType="text"
             android:background="@android:drawable/edit_text"
+            android:hint="Remarque Gauche Nord"
+            android:inputType="text"
             android:padding="8dp" />
+
         <ImageView
-            android:id="@+id/cameraIcon"
+            android:id="@+id/cameraIcon2"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="67dp"
             android:layout_margin="0dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Prendre une photo"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Prendre une photo"
+            android:focusable="true"
+            android:src="@android:drawable/ic_menu_camera" />
     </LinearLayout>
 
     <View
@@ -89,12 +139,16 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="#900C3F" />
-    <EditText
-        android:id="@+id/editPanneau1"
+    <TextView
+        android:id="@+id/labelPanneauDroiteNord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du panneau"
-        android:inputType="text" />
+        android:text="Panneau Droite (Nord)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginVertical="8dp"
+        android:gravity="center"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -107,39 +161,87 @@
             android:text="Situation :"
             android:textSize="16sp"
             android:layout_gravity="center_vertical"/>
+    </LinearLayout>
 
-        <Spinner
-            android:id="@+id/spinnerSituation"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <CheckBox
+                android:id="@+id/checkF2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="F"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkCa2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="Ca"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkAA2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="AA"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkDF2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="DF"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="-40dp"
         android:padding="16dp">
 
         <EditText
-            android:id="@+id/editRemarque1"
+            android:id="@+id/editRemarqueDroiteNord"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_weight="1"
-            android:hint="Remarque"
-            android:inputType="text"
             android:background="@android:drawable/edit_text"
+            android:hint="Remarque DroiteNord"
+            android:inputType="text"
             android:padding="8dp" />
+
         <ImageView
-            android:id="@+id/cameraIcon"
+            android:id="@+id/cameraIcon3"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="67dp"
             android:layout_margin="0dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Prendre une photo"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Prendre une photo"
+            android:focusable="true"
+            android:src="@android:drawable/ic_menu_camera" />/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
@@ -147,12 +249,16 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="#900C3F" />
-    <EditText
-        android:id="@+id/editPanneau1"
+    <TextView
+        android:id="@+id/labelPanneauGaucheSud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du panneau"
-        android:inputType="text" />
+        android:text="Panneau Gauche (Sud)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginVertical="8dp"
+        android:gravity="center"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -162,42 +268,90 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:text="Situation :"
-            android:textSize="16sp"
-            android:layout_gravity="center_vertical"/>
+            android:textSize="16sp" />
+    </LinearLayout>
 
-        <Spinner
-            android:id="@+id/spinnerSituation"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <CheckBox
+                android:id="@+id/checkF3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="F"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkCa3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="Ca"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkAA3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="AA"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkDF3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="DF"
+                android:textSize="16sp" />
+        </LinearLayout>/>
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="-40dp"
         android:padding="16dp">
 
         <EditText
-            android:id="@+id/editRemarque1"
+            android:id="@+id/editRemarqueGaucheSud"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_weight="1"
-            android:hint="Remarque"
-            android:inputType="text"
             android:background="@android:drawable/edit_text"
+            android:hint="Remarque Gauche Sud"
+            android:inputType="text"
             android:padding="8dp" />
+
         <ImageView
-            android:id="@+id/cameraIcon"
+            android:id="@+id/cameraIcon4"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="67dp"
             android:layout_margin="0dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Prendre une photo"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Prendre une photo"
+            android:focusable="true"
+            android:src="@android:drawable/ic_menu_camera" />/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
@@ -205,12 +359,17 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="#900C3F" />
-    <EditText
-        android:id="@+id/editPanneau1"
+    <TextView
+        android:id="@+id/labelPanneauDroiteSud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du panneau"
-        android:inputType="text" />
+        android:text="Panneau Droite (Sud)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginVertical="8dp"
+        android:gravity="center"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -223,38 +382,96 @@
             android:text="Situation :"
             android:textSize="16sp"
             android:layout_gravity="center_vertical"/>
+    </LinearLayout>
 
-        <Spinner
-            android:id="@+id/spinnerSituation"
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <CheckBox
+                android:id="@+id/checkF"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="F"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkCa"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="Ca"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkAA"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="AA"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkDF"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="DF"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="-40dp"
         android:padding="16dp">
 
         <EditText
-            android:id="@+id/editRemarque1"
+            android:id="@+id/editRemarqueDroiteSud"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_weight="1"
-            android:hint="Remarque"
-            android:inputType="text"
             android:background="@android:drawable/edit_text"
+            android:hint="Remarque Droite Sud"
+            android:inputType="text"
             android:padding="8dp" />
+
         <ImageView
             android:id="@+id/cameraIcon"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="67dp"
             android:layout_margin="0dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Prendre une photo"
             android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Prendre une photo"
+            android:focusable="true"
+            android:src="@android:drawable/ic_menu_camera" />/>
     </LinearLayout>
-</LinearLayout>
+    <Button
+        android:id="@+id/btnValider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Valider"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp" />
+</LinearLayout></ScrollView>
