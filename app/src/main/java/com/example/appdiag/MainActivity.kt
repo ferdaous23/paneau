@@ -1,111 +1,89 @@
 package com.example.appdiag
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.view.View
-import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.preference.PreferenceManager
-import com.google.android.flexbox.FlexboxLayout
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import android.graphics.Color
 import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.flexbox.FlexboxLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var autoCompleteRue: AutoCompleteTextView
     private lateinit var titreIntersections: TextView
     private lateinit var intersectionContainer: FlexboxLayout
-    private lateinit var map: MapView
+    private val intersectionsMap = mutableMapOf<String, List<String>>()
+
+    // ✅ DTO pour Retrofit (dans ce même fichier ou en fichier séparé)
+    data class RueResponse(val rue: String, val intersections: List<String>)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Log.d("MainActivity", "Page chargée")
-
-        setContentView(R.layout.activity_main)
-
-        Log.d("MainActivity", "layout loaded") // ← Log 2
-        autoCompleteRue = findViewById(R.id.autoCompleteRue)
         titreIntersections = findViewById(R.id.titreIntersections)
         intersectionContainer = findViewById(R.id.intersectionContainer)
+        autoCompleteRue = findViewById(R.id.autoCompleteRue)
 
-        // Données source : liste d’intersections
-        val intersectionsMap = mapOf(
-            "Avenue des AUBEPINES" to listOf("LAFARGUE P.", "VIOLETTES (des)", "ORMES (des)"),
-            "Rue AUDAT (P.)" to listOf(
-                "LATTRE DE TASSIGNY (Mal de)",
-                "ACCES PARKING",
-                "VOIE SANS ISSUE",
-                "VOIE SANS ISSUE",
-                "ACCES TENNIS"
-            ),
-            "Allée AUDIBERTI J." to listOf("MELIES G.", "EINSTEIN A."),
-            "Avenue des AULNES" to listOf("REPUBLIQUE (de la)", "SOLIDARITE (de la)", "VAILLANT C.")
-        )
-
-        // Demande de permission localisation
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1
-            )
-        }
-
-        // Remplir l'AutoCompleteTextView
-        val adapter = ArrayAdapter(
+        val adapter = ArrayAdapter<String>(
             this,
             android.R.layout.simple_dropdown_item_1line,
-            intersectionsMap.keys.toList()
+            mutableListOf()
         )
         autoCompleteRue.setAdapter(adapter)
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://192.168.1.250:8083/") // change ceci avec ton URL réelle
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(ApiService::class.java)
+
+        // 🔁 Appel API sur changement de texte
+        autoCompleteRue.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.length >= 2) {
+                    apiService.getSuggestions(s.toString())
+                        .enqueue(object : Callback<List<String>> {
+                            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                                if (response.isSuccessful) {
+                                    val suggestions = response.body() ?: emptyList()
+                                    adapter.clear()
+                                    adapter.addAll(suggestions)
+                                    adapter.notifyDataSetChanged()
+                                    autoCompleteRue.showDropDown()
+                                }
+                            }
+
+                            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                                t.printStackTrace()
+                            }
+                        })
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         // Gérer la sélection
         autoCompleteRue.setOnItemClickListener { _, _, position, _ ->
             val rueChoisie = adapter.getItem(position)
             val intersections = intersectionsMap[rueChoisie]
             afficherIntersections(intersections)
-        }
-
-        // Initialisation de la carte
-        map = findViewById(R.id.map)
-
-        Configuration.getInstance().load(
-            applicationContext,
-            PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        )
-
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.setBuiltInZoomControls(true)
-        map.setMultiTouchControls(true)
-
-        val mapController = map.controller
-        mapController.setZoom(15.0)
-        val startPoint = GeoPoint(48.8583, 2.2944) // Tour Eiffel
-        mapController.setCenter(startPoint)
-
-        // ✅ Ajout de la position actuelle sur la carte
-        val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
-        myLocationOverlay.enableMyLocation()
-        map.overlays.add(myLocationOverlay)
-
-        // ✅ Centrage automatique sur position GPS
-        myLocationOverlay.runOnFirstFix {
-            runOnUiThread {
-                map.controller.animateTo(myLocationOverlay.myLocation)
-            }
         }
     }
 
@@ -131,7 +109,7 @@ class MainActivity : AppCompatActivity() {
 
                     setOnClickListener {
                         val intent = Intent(this@MainActivity, PanneauxActivity::class.java)
-                        intent.putExtra("intersection", nom) // Passer le nom du bouton
+                        intent.putExtra("intersection", nom)
                         startActivity(intent)
                     }
                 }

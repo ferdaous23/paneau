@@ -28,6 +28,10 @@ class PanneauxActivity : AppCompatActivity() {
             "⚠️ Endommagé",
             "❌ Hors d’usage"
         )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, etats)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Panneaux"
         val nomIntersection = intent.getStringExtra("intersection")
@@ -35,9 +39,7 @@ class PanneauxActivity : AppCompatActivity() {
         textView.text = nomIntersection ?: "Aucune intersection"
         textView.paintFlags = textView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, etats)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+
 
         val cameraIcon = findViewById<ImageView>(R.id.cameraIcon)
         cameraIcon.setOnClickListener {

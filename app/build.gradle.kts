@@ -46,7 +46,8 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation(libs.androidx.activity)
-
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Tests
     testImplementation("junit:junit:4.13.2")
